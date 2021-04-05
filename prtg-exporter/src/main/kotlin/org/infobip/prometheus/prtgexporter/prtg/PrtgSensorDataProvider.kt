@@ -83,7 +83,7 @@ class PrtgSensorDataProvider @Autowired constructor(@Value("\${prtg.url:http://1
                     if (prtgPassword.isEmpty()) prtgPasshash else prtgPassword
                     )
             if (filterEnabled) {
-                url += filterTags.joinToString(",","&filter_tags=@tag(",")", -1, "...", {URLEncoder.encode(it, "UTF-8")})
+                url += if(filterTags.count() > 0) filterTags.joinToString(",", "&filter_tags=@tag(", ")", -1, "...", {URLEncoder.encode(it, "UTF-8")}) else ""
                 url += filterSensorIds.joinToString(separator = "") {"&filter_objid=${URLEncoder.encode(it, "UTF-8")}"}
                 url += filterGroups.joinToString(separator = "") {"&filter_group=${URLEncoder.encode(it, "UTF-8")}"}
             }
