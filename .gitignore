@@ -30,6 +30,8 @@ hs_err_pid*
 *.iml
 *.iws
 
+*/target
+
 /local/
 
 application-local.yml
