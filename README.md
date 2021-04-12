@@ -30,6 +30,36 @@ management:
     enabled: false
 ```
 
+### Filters
+
+There are 3 different filter options:
+* `tags`: Provide an array of tags
+* `objids`: Provide an array of Object IDs
+* `groups`: Provide an array of group names
+
+Here is an incomplete example of multiple groups and a tag:
+
+```yaml
+prtg:
+  sensors:
+    filter:
+      enabled: true
+      groups: VMWare, HyperV
+      tags: pingsensor 
+...
+```
+
+### Debug Logs
+
+If you would like to see the URL being generated for PRTG, you can enable debug logs like so:
+
+```yaml
+...
+logging.level:
+  org.infobip.prometheus.prtgexporter.prtg: debug
+...
+```
+
 ## Run
 
 Using the previous configuration:

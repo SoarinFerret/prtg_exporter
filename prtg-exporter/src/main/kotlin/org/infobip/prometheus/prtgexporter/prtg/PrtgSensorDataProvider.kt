@@ -17,6 +17,7 @@ import kotlin.collections.HashMap
 
 @Service
 class PrtgSensorDataProvider @Autowired constructor(@Value("\${prtg.url:http://127.0.0.1:8080}") val prtgUrl: String,
+                                                    @Value("\${prtg.debug:false}") val prtgDebugEnabled: Boolean,
                                                     @Value("\${prtg.username:}") val prtgUsername: String,
                                                     @Value("\${prtg.passhash:}") val prtgPasshash: String,
                                                     @Value("\${prtg.password:}") val prtgPassword: String,
@@ -82,11 +83,13 @@ class PrtgSensorDataProvider @Autowired constructor(@Value("\${prtg.url:http://1
                     if (prtgPassword.isEmpty()) "passhash" else "password",
                     if (prtgPassword.isEmpty()) prtgPasshash else prtgPassword
                     )
+            log.debug("Pre-Filter URL: " + url)
             if (filterEnabled) {
                 url += if(filterTags.count() > 0) filterTags.joinToString(",", "&filter_tags=@tag(", ")", -1, "...", {URLEncoder.encode(it, "UTF-8")}) else ""
                 url += filterSensorIds.joinToString(separator = "") {"&filter_objid=${URLEncoder.encode(it, "UTF-8")}"}
                 url += filterGroups.joinToString(separator = "") {"&filter_group=${URLEncoder.encode(it, "UTF-8")}"}
             }
+            log.debug("Post-Filter URL: " + url)
             futures.add(asyncHttpClient.prepareGet(url).execute())
             toRequest -= requestSize
             from += requestSize
@@ -99,7 +102,6 @@ class PrtgSensorDataProvider @Autowired constructor(@Value("\${prtg.url:http://1
     private fun parseSensorsResponse(response: Response): Collection<PrtgSensorData> {
         val objectMapper = ObjectMapper()
         val prtgResponse = objectMapper.readValue(TokenReplacingStream(TokenReplacingStream(response.responseBodyAsStream, "\"\"".toByteArray(), "null".toByteArray()), "\"No data\"".toByteArray(), "null".toByteArray()), PrtgSensorsResponse::class.java)
-        //val prtgResponse = objectMapper.readValue(ReplacingInputStream(response.responseBodyAsStream, "\"\"", "null"), PrtgSensorsResponse::class.java)
         val sensors = prtgResponse.sensors!!
         collectChannels(sensors)
         return sensors
@@ -123,9 +125,7 @@ class PrtgSensorDataProvider @Autowired constructor(@Value("\${prtg.url:http://1
 
     private fun parseChannelsResponse(response: Response): Collection<PrtgChannelData> {
         val objectMapper = ObjectMapper()
-        //val prtgResponse = objectMapper.readValue(ReplacingInputStream(response.responseBodyAsStream, "\"\"", "null"), PrtgChannelsResponse::class.java)
         val prtgResponse = objectMapper.readValue(TokenReplacingStream(TokenReplacingStream(response.responseBodyAsStream, "\"\"".toByteArray(), "null".toByteArray()), "\"No data\"".toByteArray(), "null".toByteArray()), PrtgChannelsResponse::class.java)
-        //val prtgResponse = objectMapper.readValue(TokenReplacingStream(response.responseBodyAsStream, "\"\"".toByteArray(), "null".toByteArray()), PrtgChannelsResponse::class.java)
         return prtgResponse.channels!!
     }
 
