@@ -98,7 +98,8 @@ class PrtgSensorDataProvider @Autowired constructor(@Value("\${prtg.url:http://1
 
     private fun parseSensorsResponse(response: Response): Collection<PrtgSensorData> {
         val objectMapper = ObjectMapper()
-        val prtgResponse = objectMapper.readValue(response.responseBodyAsStream, PrtgSensorsResponse::class.java)
+        val prtgResponse = objectMapper.readValue(TokenReplacingStream(TokenReplacingStream(response.responseBodyAsStream, "\"\"".toByteArray(), "null".toByteArray()), "\"No data\"".toByteArray(), "null".toByteArray()), PrtgSensorsResponse::class.java)
+        //val prtgResponse = objectMapper.readValue(ReplacingInputStream(response.responseBodyAsStream, "\"\"", "null"), PrtgSensorsResponse::class.java)
         val sensors = prtgResponse.sensors!!
         collectChannels(sensors)
         return sensors
@@ -122,7 +123,9 @@ class PrtgSensorDataProvider @Autowired constructor(@Value("\${prtg.url:http://1
 
     private fun parseChannelsResponse(response: Response): Collection<PrtgChannelData> {
         val objectMapper = ObjectMapper()
-        val prtgResponse = objectMapper.readValue(response.responseBodyAsStream, PrtgChannelsResponse::class.java)
+        //val prtgResponse = objectMapper.readValue(ReplacingInputStream(response.responseBodyAsStream, "\"\"", "null"), PrtgChannelsResponse::class.java)
+        val prtgResponse = objectMapper.readValue(TokenReplacingStream(TokenReplacingStream(response.responseBodyAsStream, "\"\"".toByteArray(), "null".toByteArray()), "\"No data\"".toByteArray(), "null".toByteArray()), PrtgChannelsResponse::class.java)
+        //val prtgResponse = objectMapper.readValue(TokenReplacingStream(response.responseBodyAsStream, "\"\"".toByteArray(), "null".toByteArray()), PrtgChannelsResponse::class.java)
         return prtgResponse.channels!!
     }
 
