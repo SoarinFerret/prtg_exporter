@@ -80,6 +80,10 @@ scrape_configs:
         - 127.0.0.1:8090
 ```
 
+### Kubernetes
+
+A helm chart is provided for your convenience. Please see the [chart readme](charts/prometheus-prtg-exporter/readme.md) for more information.
+
 ## Attribution
 
 Special thanks to:
