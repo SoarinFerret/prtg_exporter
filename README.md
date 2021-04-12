@@ -14,8 +14,6 @@ docker build -t prtg-exporter:latest .
 Create a `application-local.yml` file with the following:
 
 ```yaml
-server:
-  port: 8090
 prtg:
   url: https://prtg.example.com
   username: myuser
