@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  prtg-exporter:
+    build: .
+    container_name: prtg-exporter
+    ports:
+      - '8090:8090'
+    volumes:
+      - ./application-local.yml:/prtg/application.yml
